@@ -1,0 +1,35 @@
+host: ":8087"
+
+# 火山引擎在线推理：https://console.volcengine.com/ark
+api_key: "f22f811b-47d0-4ff0-aa03-cac34114b2ee"
+model: "doubao-pro-32k-241215"
+
+mysql:
+  dsn: "%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local"
+  host: localhost
+  port: 3306
+  dbname: "douyinmall"
+  user: "mysqluser"
+  password: "password1234"
+
+
+kitex:
+  service: "checkout"
+  address: ":8887"
+  metrics_port: ":9091"
+  log_level: info
+  log_file_name: "log/kitex.log"
+
+
+registry:
+  registry_address:
+    - 127.0.0.1:2379
+  username: ""
+  password: ""
+
+jwt:
+  secret_key: "your-secret-key"
+  whitelist:
+    - "/api/v1/users/login"
+    - "/api/v1/users/register"
+    - "/api/v1/hello"

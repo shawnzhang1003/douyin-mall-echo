@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package ai_agent;
+
+option go_package = '/ai_agent';
+
+service AI_AgentService {
+  rpc Hello(HelloReq) returns (HelloResp) {}
+}
+
+message HelloReq {
+    string ping = 1;
+}
+
+message HelloResp {}

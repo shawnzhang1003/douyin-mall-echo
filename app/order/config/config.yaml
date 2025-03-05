@@ -1,0 +1,47 @@
+host: ":8081"
+# log:
+#   # logpath: "./log/echo.log"
+#   log_max_size: 500 #MB
+#   log_max_backups: 3
+#   log_max_age: 8 #days
+
+mysql:
+  dsn: "%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local"
+  host: 127.0.0.1
+  port: 3306
+  dbname: "douyinmall"
+  user: "mysqluser"
+  password: "password1234"
+
+
+kitex:
+  service: "order"
+  address: ":8881"
+  metrics_port: ":9001"
+  log_level: info
+  log_file_name: "log/kitex.log"
+
+
+registry:
+  registry_address:
+    - 127.0.0.1:2379
+  username: ""
+  password: ""
+
+
+rocketmq:
+  groupname: "dymall"
+  topic: "order_timeout_check"
+  nsaddrs: 
+    - 127.0.0.1:9876
+  braddrs: 
+    - 127.0.0.1:10911
+  retrycount: 3
+  retrytimeout: 2s
+
+jwt:
+  secret_key: "your-secret-key"
+  whitelist:
+    - "/api/v1/users/login"
+    - "/api/v1/users/register"
+    - "/api/v1/hello"

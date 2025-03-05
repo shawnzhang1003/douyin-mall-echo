@@ -1,0 +1,31 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s  #global catch time
+    static_configs:
+      - targets: ['127.0.0.1:9090']
+  # prometheus port 9001
+  - job_name: 'user'
+    static_configs:
+      - targets: [ 'localhost:9001' ]
+        labels:
+          job: user
+          app: user
+          env: dev
+  # - job_name: 'order-rpc'
+  #   static_configs:
+  #     - targets: [ 'douyin:4002' ]
+  #       labels:
+  #         job: order-rpc
+  #         app: order-rpc
+  #         env: dev
+  # - job_name: 'order-mq'
+  #   static_configs:
+  #     - targets: [ 'douyin:4003' ]
+  #       labels:
+  #         job: order-mq
+  #         app: order-mq
+  #         env: dev
+

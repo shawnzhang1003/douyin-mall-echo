@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pay;
+
+option go_package = "/pay";
+
+service Pay {
+    rpc AliPay (PayRequest) returns (PayResponse) {}
+}
+message PayRequest {
+    string order_id = 1;
+    double totoal_price = 2;
+}
+message PayResponse {
+    string pay_url = 1;
+}

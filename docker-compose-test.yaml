@@ -1,0 +1,91 @@
+######## 项目依赖的环境，启动项目之前要先启动此环境 #######
+## 联调用
+services:
+  mysql:
+    image: "mysql:9.2.0"
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password1234
+      - MYSQL_USER=mysqluser
+      - MYSQL_PASSWORD=password1234
+      - MYSQL_DATABASE=douyinmall
+  etcd:
+    image: docker.io/bitnami/etcd:3.5
+    container_name: etcd
+    ports:
+      - 2379:2379
+      - 2380:2380
+    volumes:
+      - ./etcd/data:/bitnami/etcd-data
+    environment:
+      - TZ=Asia/Shanghai
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus
+  #   environment:
+  #     # 时区上海
+  #     TZ: Asia/Shanghai
+  #   volumes:
+  #     - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - ./data/prometheus/data:/prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #   restart: always
+  #   user: root
+  #   ports:
+  #     - 9090:9090
+  #   network_mode: host
+    # networks:
+    #   - douyin_net
+
+  #查看prometheus监控数据
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: grafana
+  #   hostname: grafana
+  #   environment:
+  #     - GF_AUTH_ANONYMOUS_ENABLED=true
+  #     - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+  #     - GF_AUTH_DISABLE_LOGIN_FORM=true
+  #     # 时区上海
+  #     # TZ: Asia/Shanghai
+  #   restart: always
+  #   volumes:
+  #       - ./data/grafana/data:/var/lib/grafana
+  #   ports:
+  #       - "3000:3000"
+  #   network_mode: host
+
+  # RocketMQ
+  namesrv:
+    image: apache/rocketmq:latest
+    container_name: rmqnamesrv
+    command: sh mqnamesrv
+    ports:
+      - 9876:9876
+    volumes:
+      # 将日志和存储目录挂载到主机，方便持久化数据与日志查看
+      - ./data/rocketmq_data/logs:/home/rocketmq/logs
+      - ./data/rocketmq_data/store:/home/rocketmq/store
+
+  broker:
+    image: apache/rocketmq:latest
+    container_name: rmqbroker
+    depends_on:
+      - namesrv
+    command: sh mqbroker --enable-proxy -c /home/rocketmq/rocketmq/broker.conf
+    ports:
+      - 10911:10911  # Broker 的主服务端口
+      - 10909:10909  # Broker 的通信端口
+      - 10912:10912
+    environment:
+      # 指定 NameSrv 地址
+      - NAMESRV_ADDR=rmqnamesrv:9876
+    volumes:
+      - ./data/rocketmq_data/logs:/home/rocketmq/logs
+      - ./data/rocketmq_data/store:/home/rocketmq/store
+      - ./deploy/rocketmq/:/home/rocketmq/rocketmq

@@ -1,0 +1,23 @@
+version: "3"
+services:
+  mysql:
+    image: "mysql:9.2.0"
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password1234
+      - MYSQL_USER=mysqluser
+      - MYSQL_PASSWORD=password1234
+      - MYSQL_DATABASE=pay
+  etcd:
+    image: docker.io/bitnami/etcd:3.5
+    container_name: etcd
+    ports:
+      - 2379:2379
+      - 2380:2380
+    volumes:
+      - ./etcd/data:/bitnami/etcd-data
+    environment:
+      - TZ=Asia/Shanghai
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379

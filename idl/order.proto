@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package order;
+
+option go_package = "/order";
+
+// 订单服务
+service OrderService {
+    // 创建订单
+    rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse);
+    // 订单支付成功通知
+    rpc OrderPaySuccess (OrderPaySuccessRequest) returns (OrderPaySuccessResponse);
+}
+
+// 订单结构体
+message Order {
+    uint32 id = 1;
+    uint32 user_id = 2;
+    // 可以根据实际情况添加其他订单字段
+}
+
+// 创建订单请求
+message CreateOrderRequest {
+    int64 user_id = 1;
+    int64 cart_id = 2;
+    string user_addr = 3;
+    repeated int64 product_ids = 4;
+    repeated int64 quantities = 5;
+    repeated float prices = 6;
+}
+
+// 创建订单响应
+message CreateOrderResponse {
+    uint64 order_id = 1;
+    string message = 2;
+}
+
+// 订单支付成功请求
+message OrderPaySuccessRequest {
+    uint64 order_id = 1;
+}
+
+// 订单支付成功响应
+message OrderPaySuccessResponse {
+    string message = 1;
+}

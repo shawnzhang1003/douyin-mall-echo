@@ -1,0 +1,15 @@
+go 1.23.3
+
+use (
+	./app/ai_agent
+	./app/auth
+	./app/cart
+	./app/checkout
+	./app/douyin-mall-echo-templete
+	./app/order
+	./app/pay
+	./app/product
+	./app/user
+	./common
+	./rpc_gen
+)

@@ -1,0 +1,40 @@
+syntax="proto3";
+
+package user;
+import "google/protobuf/timestamp.proto";
+// import "kitex_timestamp.proto";  // 添加这行
+
+option go_package="/user";
+
+service UserService {
+    rpc Register(RegisterReq) returns (RegisterResp) {}
+    rpc Login(LoginReq) returns (LoginResp) {}
+    rpc GetUserLogoutTime(LogoutTimeReq) returns (LogoutTimeResp) {}
+}
+
+message RegisterReq {
+    string email = 1;
+    string password = 2;
+    string confirm_password = 3;
+}
+
+message RegisterResp {
+    int32 user_id = 1;
+}
+
+message LoginReq {
+    string email= 1;
+    string password = 2;
+}
+
+message LoginResp {
+    int32 user_id = 1;
+}
+
+message LogoutTimeReq {
+    int32 user_id = 1;
+}
+
+message LogoutTimeResp {
+    google.protobuf.Timestamp logout_time = 1;
+}

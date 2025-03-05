@@ -1,0 +1,42 @@
+host: ":8086"
+log:
+  # logpath: "./log/echo.log"
+  log_max_size: 500 #MB
+  log_max_backups: 3
+  log_max_age: 8 #days
+
+redis:
+  address: "127.0.0.1:6379"
+  username: ""
+  password: ""
+  db: 0
+# mysql:
+#   dsn: "%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local"
+#   host: "localhost"
+#   port: 3306
+#   dbname: "douyinmall"
+#   user: "mysqluser"
+#   password: "password"
+
+kitex:
+  service: "auth"
+  address: ":8886"
+  metrics_port: ":9006"
+  log_level: info
+  log_file_name: "log/kitex.log"
+
+
+registry:
+  registry_address:
+    - 127.0.0.1:2379
+  username: ""
+  password: ""
+
+jwt:
+  secret_key: "your-secret-key"
+  refresh_secret_key: "your-refresh-secret-key"
+  whitelist:
+    - "/api/v1/users/login"
+    - "/api/v1/users/register"
+    - "/api/v1/hello"
+    - "/api/v1/auth/refresh"

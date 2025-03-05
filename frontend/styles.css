@@ -1,0 +1,159 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+.api-test-container {
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.path-input, .json-input, .response-output {
+    width: calc(100% - 16px); /* 减去左右内边距的总和 */
+    box-sizing: border-box; /* 将内边距和边框计入元素的总宽度 */
+}
+
+.request-component {
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    box-sizing: border-box; /* 确保内边距不会增加组件的总宽度 */
+}
+
+.json-input {
+    width: 100%;
+    height: 100px;
+    margin-top: 5px;
+}
+
+.method-select {
+    margin-right: 10px;
+}
+.response-container {
+    margin-top: 10px;
+}
+
+.response-output {
+    width: 100%;
+    height: 200px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    font-family: monospace;
+    resize: vertical;
+}
+
+.request-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.time-info {
+    color: #666;
+    font-size: 14px;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.layout-switch {
+    display: flex;
+    gap: 10px;
+}
+
+.layout-btn {
+    padding: 8px 15px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.layout-btn.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+#requestsContainer {
+    display: grid;
+    gap: 20px;
+    width: 100%;
+}
+
+#requestsContainer.single-column {
+    grid-template-columns: 1fr;
+}
+
+#requestsContainer.double-column {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 768px) {
+    #requestsContainer.double-column {
+        grid-template-columns: 1fr;
+    }
+}
+.component-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    padding: 5px 10px;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+}

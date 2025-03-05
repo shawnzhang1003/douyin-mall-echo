@@ -1,0 +1,31 @@
+host: ":8083"
+mysql:
+  dsn: "%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local"
+  host: localhost
+  port: 3306
+  dbname: "douyinmall"
+  user: "mysqluser"
+  password: "password1234"
+
+
+kitex:
+  service: "cart"
+  address: ":8883"
+  metrics_port: ":9091"
+  log_level: info
+  log_file_name: "log/kitex.log"
+
+
+registry:
+  registry_address:
+    - 127.0.0.1:2379
+  username: ""
+  password: ""
+
+jwt:
+  secret_key: "your-secret-key"
+  whitelist:
+    - "/api/v1/users/login"
+    - "/api/v1/users/register"
+    - "/api/v1/hello"
+    - "/api/v1/cart"

@@ -1,0 +1,35 @@
+host: ":8080"
+log:
+  # logpath: "./log/echo.log"
+  log_max_size: 500 #MB
+  log_max_backups: 3
+  log_max_age: 8 #days
+mysql:
+  dsn: "%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local"
+  host: 127.0.0.1
+  port: 3306
+  dbname: "???"
+  user: "root"
+  password: "???"
+
+
+kitex:
+  service: "user"
+  address: ":8880"
+  metrics_port: ":9001"
+  log_level: info
+  log_file_name: "log/kitex.log"
+
+
+registry:
+  registry_address:
+    - 127.0.0.1:2379
+  username: ""
+  password: ""
+
+jwt:
+  secret_key: "your-secret-key"
+  whitelist:
+    - "/api/v1/login"
+    - "/api/v1/register"
+    - "/api/v1/hello"

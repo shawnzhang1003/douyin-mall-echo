@@ -1,0 +1,3 @@
+go build test_json.go && ./test_json -method POST -url http://localhost:8083/api/v1/cart -concurrency 30 -requests 300
+
+go build test_query.go && ./test_query -method GET -url http://127.0.0.1:8083/api/v1/cart?userid=123 -concurrency 30 -requests 300
