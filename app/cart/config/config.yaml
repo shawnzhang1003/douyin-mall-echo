@@ -11,7 +11,7 @@ mysql:
 kitex:
   service: "cart"
   address: ":8883"
-  metrics_port: ":9091"
+  metrics_port: ":9003"
   log_level: info
   log_file_name: "log/kitex.log"
 

@@ -11,11 +11,14 @@
 <body>
     <div class="api-test-container">
         <div class="toolbar">
-            <button id="addRequest">新建请求</button>
-            <div class="layout-switch">
-                <button id="singleColumn" class="layout-btn active">单列布局</button>
-                <button id="doubleColumn" class="layout-btn">双列布局</button>
+            <div class="left-buttons">
+                <button id="addRequest">新建请求</button>
+                <div class="layout-switch">
+                    <button id="singleColumn" class="layout-btn active">单列布局</button>
+                    <button id="doubleColumn" class="layout-btn">双列布局</button>
+                </div>
             </div>
+            <button id="logoutButton" class="logout-button">登出</button>
         </div>
         <div id="requestsContainer" class="single-column"></div>
     </div>

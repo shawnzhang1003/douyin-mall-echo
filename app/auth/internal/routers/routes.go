@@ -12,13 +12,13 @@ func RegisterRoutes(e *echo.Echo) {
 	e.GET("/health", healthHandler)
 	api := e.Group("/api/v1")
 	api.Any("/auth/refresh", RefreshTokenHandler)
+	api.GET("/hello", HelloWorldHandler)
 
 	api.Use(middleware.JWTAuthMiddleware(config.GlobalConfig.JWT.SecretKey,
 		utils.DefaultIsWhiteListFunc(config.GlobalConfig.JWT.Whitelist)))
 	{
 		// api.POST("/login", LoginHandler)
 		// api.POST("/register", RegisterHandler)
-		api.GET("/hello", HelloWorldHandler)
 	}
 
 	// data, err := json.MarshalIndent(e.Routes(), "", "  ")

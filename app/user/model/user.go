@@ -45,7 +45,7 @@ func isEmailExists(email string) bool {
 	return true
 }
 
-func GetUserByID(id int32) (*User, error) {
+func GetUserByID(id uint) (*User, error) {
 	db := dal.DB
 	var user User
 	if err := db.First(&user, "id = ?", id).Error; err != nil {

@@ -8,7 +8,6 @@ import (
 	"github.com/MakiJOJO/douyin-mall-echo/common/kitexopt"
 	"github.com/MakiJOJO/douyin-mall-echo/common/mtl"
 	"github.com/MakiJOJO/douyin-mall-echo/rpc_gen/kitex_gen/order/orderservice"
-	"github.com/MakiJOJO/douyin-mall-echo/rpc_gen/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/client"
 )
 
@@ -16,8 +15,8 @@ var (
 	// CartClient    cartservice.Client
 	// ProductClient productcatalogservice.Client
 	// PaymentClient paymentservice.Client
-	OrderClient  orderservice.Client
-	UserClient   userservice.Client
+	OrderClient orderservice.Client
+	// UserClient   userservice.Client
 	once         sync.Once
 	err          error
 	registryAddr []string
@@ -35,18 +34,19 @@ func InitClient() {
 		})
 		// 只初始化本服务需要远程调用的rpc服务, 不同的rpc服务需要创建不同的client
 
-		initUserClient()
+		// initUserClient()
 		// initCartClient()
 		// initProductClient()
 		// initPaymentClient()
-		// initOrderClient()
+		initOrderClient()
 	})
 }
 
-func initUserClient() {
-	UserClient, err = userservice.NewClient("user", commonSuite)
+func initOrderClient() {
+	OrderClient, err = orderservice.NewClient("order", commonSuite)
 	if err != nil {
 		mtl.Logger.Error("init user kitex rpc error.", "err: ", err.Error())
+
 	}
 }
 
@@ -75,11 +75,5 @@ func initPaymentClient() {
 	}
 }
 
-func initOrderClient() {
-	OrderClient, err = orderservice.NewClient("order", commonSuite)
-	if err != nil {
-		mtl.Logger.Error("init user kitex rpc error.", "err: ", err.Error())
 
-	}
-}
 */

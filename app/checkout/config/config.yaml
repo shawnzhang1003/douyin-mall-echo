@@ -11,7 +11,7 @@ mysql:
 kitex:
   service: "checkout"
   address: ":8885"
-  metrics_port: ":9091"
+  metrics_port: ":9005"
   log_level: info
   log_file_name: "log/kitex.log"
 

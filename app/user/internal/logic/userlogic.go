@@ -10,6 +10,7 @@ import (
 	"github.com/MakiJOJO/douyin-mall-echo/app/user/rpc/client"
 	"github.com/MakiJOJO/douyin-mall-echo/app/user/util"
 	"github.com/MakiJOJO/douyin-mall-echo/rpc_gen/kitex_gen/auth"
+	"gorm.io/gorm"
 )
 
 var ErrEncryptPasswordFail = errors.New("cannot encrypt password")
@@ -66,4 +67,20 @@ func UserLogout(userID uint) error {
 
 func GetUserLogoutTime(userID uint) (time.Time, error) {
 	return model.GetUserLogoutTime(userID)
+}
+
+func GetUserInfo(userID uint) (*model.User, error) {
+	user, err := model.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+	return &model.User{
+		Model: gorm.Model{
+			ID: user.ID,
+			CreatedAt: user.CreatedAt,
+		},
+		Email:      user.Email,
+		Gender:     user.Gender,
+		LogoutTime: user.LogoutTime,
+	}, nil
 }

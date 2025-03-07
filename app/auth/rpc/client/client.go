@@ -7,7 +7,6 @@ import (
 	"github.com/MakiJOJO/douyin-mall-echo/app/auth/config"
 	"github.com/MakiJOJO/douyin-mall-echo/common/kitexopt"
 	"github.com/MakiJOJO/douyin-mall-echo/common/mtl"
-	"github.com/MakiJOJO/douyin-mall-echo/rpc_gen/kitex_gen/order/orderservice"
 	"github.com/MakiJOJO/douyin-mall-echo/rpc_gen/kitex_gen/user/userservice"
 	"github.com/cloudwego/kitex/client"
 )
@@ -16,7 +15,6 @@ var (
 	// CartClient    cartservice.Client
 	// ProductClient productcatalogservice.Client
 	// PaymentClient paymentservice.Client
-	OrderClient  orderservice.Client
 	UserClient   userservice.Client
 	once         sync.Once
 	err          error

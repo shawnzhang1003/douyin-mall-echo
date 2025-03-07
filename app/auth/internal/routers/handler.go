@@ -6,7 +6,6 @@ import (
 
 	"github.com/MakiJOJO/douyin-mall-echo/app/auth/internal/dal"
 	"github.com/MakiJOJO/douyin-mall-echo/app/auth/internal/logic"
-	"github.com/MakiJOJO/douyin-mall-echo/common/mtl"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
@@ -17,8 +16,6 @@ func HelloWorldHandler(c echo.Context) error {
 	resp := map[string]string{
 		"message": "Hello World",
 	}
-	c.Logger().Info("Hello World")
-	mtl.Logger.Info("Hello World")
 
 	return c.JSON(http.StatusOK, resp)
 }

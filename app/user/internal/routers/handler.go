@@ -124,3 +124,13 @@ func LogoutHandler(c echo.Context) error {
 		"message": "登出成功",
 	})
 }
+
+func GetUserInfoHandler(c echo.Context) error {
+	// 获取用户信息
+	userID := c.Get("userid").(uint)
+	u, err := logic.GetUserInfo(userID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "获取用户信息失败")
+	}
+	return c.JSON(http.StatusOK, u)
+}

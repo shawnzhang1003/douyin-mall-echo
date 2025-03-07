@@ -23,6 +23,7 @@ func RegisterRoutes(e *echo.Echo) {
 		api.Use(middleware.JWTAuthMiddleware(config.GlobalConfig.JWT.SecretKey, utils.DefaultIsWhiteListFunc(config.GlobalConfig.JWT.Whitelist)))
 		api.GET("/hello", HelloWorldHandler)
 		api.POST("/logout", LogoutHandler)
+		api.GET("/info", GetUserInfoHandler)
 	}
 
 	data, err := json.MarshalIndent(e.Routes(), "", "  ")

@@ -104,6 +104,20 @@ button:hover {
     margin-bottom: 20px;
 }
 
+.left-buttons {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.logout-button {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.logout-button:hover {
+    background-color: #ffb300;
+}
 .layout-switch {
     display: flex;
     gap: 10px;

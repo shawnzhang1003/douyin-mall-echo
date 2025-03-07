@@ -14,6 +14,11 @@ class RequestComponent {
                         <option value="GET">GET</option>
                         <option value="POST">POST</option>
                         <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                    </select>
+                    <select class="data-format-select">
+                        <option value="json">JSON</option>
+                        <option value="formdata">FormData</option>
                     </select>
                     <button class="delete-button">删除</button>
                 </div>
@@ -47,6 +52,7 @@ class RequestComponent {
     async sendRequest() {
         const component = document.getElementById(`request-${this.id}`);
         const method = component.querySelector('.method-select').value;
+        const dataFormat = component.querySelector('.data-format-select').value;
         const path = component.querySelector('.path-input').value;
         const jsonData = component.querySelector('.json-input').value;
         const responseOutput = component.querySelector('.response-output');
@@ -62,13 +68,40 @@ class RequestComponent {
         timeInfo.textContent = `开始请求: ${startTime.toLocaleTimeString()}`;
 
         try {
+            let requestBody;
+            let headers = {
+                'Authorization': localStorage.getItem('accessToken')
+            };
+
+            if (method !== 'GET') {
+                if (dataFormat === 'json') {
+                    requestBody = jsonData;
+                    headers['Content-Type'] = 'application/json';
+                } else {
+                    // 将 JSON 字符串转换为 FormData
+                    const formData = new FormData();
+                    try {
+                        const jsonObj = JSON.parse(jsonData);
+                        for (const [key, value] of Object.entries(jsonObj)) {
+                            formData.append(key, value);
+                        }
+                        // 验证 FormData 内容
+                        console.log('FormData 内容:');
+                        for (let pair of formData.entries()) {
+                            console.log(pair[0] + ': ' + pair[1]);
+                        }
+                    } catch (e) {
+                        responseOutput.value = '无效的 JSON 格式';
+                        return;
+                    }
+                    requestBody = formData;
+                    // FormData 会自动设置正确的 Content-Type，所以这里不需要手动设置
+                }
+            }
             let response = await fetch(path, {
                 method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': localStorage.getItem('accessToken')
-                },
-                body: method === 'POST' ? jsonData : undefined,
+                headers,
+                body: method === 'GET' ? undefined : requestBody,
                 redirect: 'follow'
             });
 
@@ -84,20 +117,24 @@ class RequestComponent {
                 localStorage.setItem('accessToken', refreshData.accessToken);
 
                 // 再次发送原始请求
+                headers['Authorization'] = localStorage.getItem('accessToken');
                 response = await fetch(path, {
                     method,
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': localStorage.getItem('accessToken')
-                    },
-                    body: method === 'POST' ? jsonData : undefined
+                    headers,
+                    body: method === 'GET' ? undefined : requestBody,
                 });
             }
 
             const endTime = new Date();
             const duration = endTime - startTime;
-            const data = await response.json();
-            responseOutput.value = `Status Code: ${response.status}\n\n${JSON.stringify(data, null, 2)}`;
+
+            if (response.status === 504) {
+                const htmlContent = await response.text();
+                responseOutput.value = `Status Code: ${response.status}\n\n${htmlContent}`;
+            } else {
+                const data = await response.json();
+                responseOutput.value = `Status Code: ${response.status}\n\n${JSON.stringify(data, null, 2)}`;
+            }
             timeInfo.textContent = `完成时间: ${endTime.toLocaleTimeString()} (耗时: ${formatDuration(duration)})`;
         } catch (error) {
             const endTime = new Date();
@@ -111,13 +148,14 @@ class RequestComponent {
     bindEvents() {
         const component = document.getElementById(`request-${this.id}`);
         const methodSelect = component.querySelector('.method-select');
+        const dataFormatSelect = component.querySelector('.data-format-select');
         const pathInput = component.querySelector('.path-input');
         const jsonInput = component.querySelector('.json-input');
         const sendButton = component.querySelector('.send-button');
         const deleteButton = component.querySelector('.delete-button');
 
         // 保存配置的事件
-        [methodSelect, pathInput, jsonInput].forEach(element => {
+        [methodSelect, dataFormatSelect, pathInput, jsonInput].forEach(element => {
             element.addEventListener('change', () => this.saveConfig());
             element.addEventListener('input', () => this.saveConfig());
         });
@@ -133,6 +171,7 @@ class RequestComponent {
         if (this.config) {
             const component = document.getElementById(`request-${this.id}`);
             component.querySelector('.method-select').value = this.config.method || 'GET';
+            component.querySelector('.data-format-select').value = this.config.dataFormat || 'json';
             component.querySelector('.path-input').value = this.config.path || '';
             component.querySelector('.json-input').value = this.config.json || '';
         }
@@ -142,6 +181,7 @@ class RequestComponent {
         const component = document.getElementById(`request-${this.id}`);
         const config = {
             method: component.querySelector('.method-select').value,
+            dataFormat: component.querySelector('.data-format-select').value,
             path: component.querySelector('.path-input').value,
             json: component.querySelector('.json-input').value
         };
@@ -182,6 +222,25 @@ if (Object.keys(savedConfigs).length > 0) {
 document.getElementById('addRequest').addEventListener('click', () => {
     const id = Date.now().toString();
     new RequestComponent(id);
+});
+// 添加登出按钮事件
+document.getElementById('logoutButton').addEventListener('click', async () => {
+    try {
+        const response = await fetch('/api/v1/user/logout', {
+            method: 'POST',
+            headers: {
+                'Authorization': localStorage.getItem('accessToken')
+            },
+            credentials: 'include'  // 添加这行，确保发送和接收 cookie
+        });
+
+        if (response.ok) {
+            localStorage.removeItem('accessToken');
+            window.location.href = 'login.html';
+        }
+    } catch (error) {
+        console.error('登出失败:', error);
+    }
 });
 
 // 布局切换按钮
