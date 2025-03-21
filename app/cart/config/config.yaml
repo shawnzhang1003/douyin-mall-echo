@@ -29,3 +29,9 @@ jwt:
     - "/api/v1/users/register"
     - "/api/v1/hello"
     - "/api/v1/cart"
+
+redis:
+  address: "127.0.0.1:6379"
+  username: ""
+  password: ""
+  db: 0

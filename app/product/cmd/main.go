@@ -27,6 +27,10 @@ func main() {
 
 	// 初始化mysql
 	dal.Init()
+
+	// 初始化redis
+	dal.RedisInit()
+	
 	// 自动迁移
 	model.AutoMigrate()
 

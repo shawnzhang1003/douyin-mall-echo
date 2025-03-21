@@ -107,6 +107,7 @@ func GetProductByIDHandler(c echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Invalid product ID")
 	}
+	// 将读取redis那部分也放在model中吧，这里好像没有复用logic
 	product, err := model.GetById(uint32(productID))
 	if err != nil {
 		return err

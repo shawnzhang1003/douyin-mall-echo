@@ -15,10 +15,14 @@
 package model
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/MakiJOJO/douyin-mall-echo/app/product/internal/dal"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -37,9 +41,41 @@ func (p Product) TableName() string {
 }
 
 func GetById(productId uint32) (product Product, err error) {
+
+	// 从redis中寻找产品信息
+	rc := dal.RedisClient
+	cachedProduct, err := rc.Get(context.Background(), fmt.Sprintf("product:%v", productId)).Result()
+	if err == nil {
+		err = json.Unmarshal([]byte(cachedProduct), &product)
+		if err != nil {
+			return product, fmt.Errorf("解析缓存数据失败: %v", err)
+		}
+		return product, nil
+	} else if err != redis.Nil {
+		//处理 Redis非键不存在的错误
+		return product, fmt.Errorf("redis查询出错: %v", err)
+	}
+
+	//缓存未命中，则从数据库中搜索
 	db := dal.DB
-	err = db.Model(&Product{}).First(&product, productId).Error
-	return product, err
+	if err = db.Model(&Product{}).First(&product, productId).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+            return product, fmt.Errorf("产品 ID %d 对应的产品不存在", productId)
+        }
+        return product, fmt.Errorf("数据库查询出错: %v", err)
+	}
+
+	// 将商品信息存入 Redis 缓存，设置过期时间为 1 小时
+	productJSON, err := json.Marshal(product)
+	if err != nil {
+		return product, fmt.Errorf("序列化商品信息失败: %v", err)
+	}
+	err = dal.RedisClient.Set(context.Background(), fmt.Sprintf("product:%v", productId), string(productJSON), time.Hour).Err()
+	if err != nil {
+		return product, fmt.Errorf("存入 Redis 缓存失败: %v", err)
+	}
+	return product, nil
+
 }
 
 func SearchProducts(q string) (products []*Product, err error) {

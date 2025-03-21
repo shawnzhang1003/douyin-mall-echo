@@ -14,6 +14,7 @@ type Config struct {
 	Kitex    config.Kitex     `mapstructure:"kitex"`
 	JWT      config.JWTConfig `mapstructure:"jwt"`
 	MySQL    config.MySQL     `mapstructure:"mysql"`
+	Redis    config.Redis     `mapstructure:"redis"`
 }
 
 var GlobalConfig Config

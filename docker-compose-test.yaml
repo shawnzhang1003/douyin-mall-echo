@@ -89,3 +89,14 @@ services:
       - ./data/rocketmq_data/logs:/home/rocketmq/logs
       - ./data/rocketmq_data/store:/home/rocketmq/store
       - ./deploy/rocketmq/:/home/rocketmq/rocketmq
+
+  redis:
+    image: "redis:latest"
+    container_name: "my_redis"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:   

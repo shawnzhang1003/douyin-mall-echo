@@ -2,10 +2,11 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
-
 	"fmt"
 
+	"github.com/MakiJOJO/douyin-mall-echo/app/cart/internal/dal"
 	"github.com/MakiJOJO/douyin-mall-echo/app/cart/model"
 	"github.com/MakiJOJO/douyin-mall-echo/app/cart/rpc/client"
 	product "github.com/MakiJOJO/douyin-mall-echo/rpc_gen/kitex_gen/product"
@@ -53,21 +54,26 @@ func GetCartReturnInfo(userid uint32) (itemList []*retItemInfo, err error) {
 	getCartRet, err := GetCart(userid)
 
 	for _, cartItem := range getCartRet {
-		getProductResult, err := client.ProductClient.GetProduct(context.Background(), &product.GetProductReq{Id: cartItem.ProductId})
+		// getProductResult, err := client.ProductClient.GetProduct(context.Background(), &product.GetProductReq{Id: cartItem.ProductId})
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// if getProductResult.Product == nil {
+		// 	return nil, fmt.Errorf("product %v info does not exist", cartItem.ProductId)
+		// }
+		getProductResult, err := getSingleProductInfo(cartItem.ProductId)
 		if err != nil {
 			return nil, err
 		}
-		if getProductResult.Product == nil {
-			return nil, fmt.Errorf("product %v info does not exist", cartItem.ProductId)
-		}
+
 		itemList = append(itemList, &retItemInfo{
-			ProductId: getProductResult.Product.Id,
-			Name: getProductResult.Product.Name,
-			Description: getProductResult.Product.Description,
-			Qty: cartItem.Qty,
-			Picture: getProductResult.Product.Picture,
-			Price: getProductResult.Product.Price * float32(cartItem.Qty),
-			Categories: getProductResult.Product.Categories,
+			ProductId:   getProductResult.Id,
+			Name:        getProductResult.Name,
+			Description: getProductResult.Description,
+			Qty:         cartItem.Qty,
+			Picture:     getProductResult.Picture,
+			Price:       getProductResult.Price * float32(cartItem.Qty),
+			Categories:  getProductResult.Categories,
 		})
 	}
 	return
@@ -79,4 +85,30 @@ func EmptyCart(userid uint32) error {
 		return err
 	}
 	return nil
+}
+
+// 根据产品id获取产品的信息，并放在redis缓存中
+func getSingleProductInfo(product_id uint32) (*product.Product, error) {
+	cachedProduct, err := dal.RedisClient.Get(context.Background(), fmt.Sprintf("product:%v", product_id)).Result()
+	if err == nil {
+		var retProduct product.Product
+		err = json.Unmarshal([]byte(cachedProduct), &retProduct)
+		if err != nil {
+			return nil, fmt.Errorf("解析缓存数据失败: %v", err)
+		}
+		return &retProduct, nil
+	}
+
+	// 缓存未命中，调用 RPC 获取商品信息
+	resp, err := client.ProductClient.GetProduct(context.Background(), &product.GetProductReq{
+		Id: product_id,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("RPC 调用失败: %v", err)
+	}
+	if resp.Product == nil {
+		return nil, fmt.Errorf("product %v info does not exist", product_id)
+	}
+
+	return resp.Product, nil
 }

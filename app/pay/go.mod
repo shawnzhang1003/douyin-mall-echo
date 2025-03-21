@@ -13,7 +13,6 @@ require (
 	github.com/cloudwego/kitex v0.12.2
 	github.com/go-sql-driver/mysql v1.8.1
 	github.com/hertz-contrib/obs-opentelemetry/provider v0.3.0
-	github.com/kitex-contrib/registry-etcd v0.2.5
 	github.com/labstack/echo/v4 v4.13.3
 	github.com/labstack/gommon v0.4.2
 	github.com/samber/slog-echo v1.15.1
@@ -66,6 +65,7 @@ require (
 	github.com/kitex-contrib/config-etcd v0.2.0 // indirect
 	github.com/kitex-contrib/monitor-prometheus v0.2.0 // indirect
 	github.com/kitex-contrib/obs-opentelemetry v0.2.9 // indirect
+	github.com/kitex-contrib/registry-etcd v0.2.5 // indirect
 	github.com/klauspost/compress v1.17.9 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
