@@ -1,0 +1,15 @@
+
+services:
+  redis:
+    image: "redis:latest"
+    container_name: "my_redis-2"
+    ports:
+      - "6380:6380"
+    environment:
+      - PORT=6380  # 设置 Redis 的运行端口
+    command: redis-server --port ${PORT}  # 使用环境变量指定端口
+    volumes:
+      - redis_data:/data
+
+volumes:
+  redis_data:   

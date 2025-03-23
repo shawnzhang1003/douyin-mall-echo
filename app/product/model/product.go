@@ -60,9 +60,9 @@ func GetById(productId uint32) (product Product, err error) {
 	db := dal.DB
 	if err = db.Model(&Product{}).First(&product, productId).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-            return product, fmt.Errorf("产品 ID %d 对应的产品不存在", productId)
-        }
-        return product, fmt.Errorf("数据库查询出错: %v", err)
+			return product, fmt.Errorf("产品 ID %d 对应的产品不存在", productId)
+		}
+		return product, fmt.Errorf("数据库查询出错: %v", err)
 	}
 
 	// 将商品信息存入 Redis 缓存，设置过期时间为 1 小时
@@ -112,15 +112,41 @@ func CreateProduct(productName string, productDescription string, productPicture
 	return &retProduct, nil
 }
 
-func UpdateProduct(productId uint32, productName string, productDescription string, productPicture string, productPrice float32, categoryName string) (product_id uint32, err error) {
+func UpdateProduct(productId uint32, productName string, productDescription string, productPicture string, productPrice float32, categoryName string) (product Product, err error) {
 	db := dal.DB
 	result := db.Model(&Product{}).Where("id = ?", productId).Updates(Product{Name: productName, Price: productPrice, Description: productDescription, Picture: productPicture})
 
 	// 检查更新是否成功
 	if result.Error != nil {
-		return productId, result.Error
+		return Product{}, result.Error
 	}
-	return productId, nil
+
+	// // 查询更新后的产品信息
+	// err = db.Where("id = ?", productId).First(&product).Error
+	// if err != nil {
+	// 	return Product{}, err
+	// }
+
+	// 更新redis
+	// 从数据库中搜索
+	if err = db.Model(&Product{}).First(&product, productId).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return product, fmt.Errorf("产品 ID %d 对应的产品不存在", productId)
+		}
+		return product, fmt.Errorf("数据库查询出错: %v", err)
+	}
+
+	// 将商品信息存入 Redis 缓存，设置过期时间为 1 小时
+	productJSON, err := json.Marshal(product)
+	if err != nil {
+		return product, fmt.Errorf("序列化商品信息失败: %v", err)
+	}
+	err = dal.RedisClient.Set(context.Background(), fmt.Sprintf("product:%v", productId), string(productJSON), time.Hour).Err()
+	if err != nil {
+		return product, fmt.Errorf("存入 Redis 缓存失败: %v", err)
+	}
+
+	return product, nil
 }
 
 func ListProducts(page int, pageSize int, categoryName string) (products []*Product, err error) {

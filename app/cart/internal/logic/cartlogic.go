@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/MakiJOJO/douyin-mall-echo/app/cart/internal/dal"
 	"github.com/MakiJOJO/douyin-mall-echo/app/cart/model"
@@ -108,6 +109,16 @@ func getSingleProductInfo(product_id uint32) (*product.Product, error) {
 	}
 	if resp.Product == nil {
 		return nil, fmt.Errorf("product %v info does not exist", product_id)
+	}
+
+	// 将商品信息存入 Redis 缓存，设置过期时间为 1 小时
+	productJSON, err := json.Marshal(resp.Product)
+	if err != nil {
+		return resp.Product, fmt.Errorf("序列化商品信息失败: %v", err)
+	}
+	err = dal.RedisClient.Set(context.Background(), fmt.Sprintf("product:%v", product_id), string(productJSON), time.Hour).Err()
+	if err != nil {
+		return resp.Product, fmt.Errorf("存入 Redis 缓存失败: %v", err)
 	}
 
 	return resp.Product, nil

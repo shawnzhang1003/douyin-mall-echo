@@ -5,7 +5,7 @@ package dal
 import (
 	"context"
 
-	"github.com/MakiJOJO/douyin-mall-echo/app/cart/config"
+	"github.com/MakiJOJO/douyin-mall-echo/app/product/config"
 	"github.com/redis/go-redis/v9"
 )
 

@@ -1,7 +1,12 @@
 package logic
 
 import (
+	"context"
+	"encoding/json"
+	"fmt"
+
 	"github.com/MakiJOJO/douyin-mall-echo/app/product/model"
+	"github.com/MakiJOJO/douyin-mall-echo/pkg/rocketmq"
 )
 
 func GetProductsByCategoryID(category_id uint32) (products []*model.Product, err error) {
@@ -53,11 +58,33 @@ func ListProducts(page int, pageSize int, categoryName string) (products []*mode
 }
 
 func UpdateProduct(productID uint32, name string, description string, picture string, price float32, category_name string) (product_id uint32, err error) {
-	product_id, err = model.UpdateProduct(product_id, name, description, picture, price, category_name)
+	product, err := model.UpdateProduct(productID, name, description, picture, price, category_name) // 操作数据库
 	if err != nil {
-		return product_id, err
+		return productID, err
 	}
-	return product_id, nil
+
+	producer, err := rocketmq.NewProducer(&rocketmq.Config{
+		NameServerAddr: []string{"127.0.0.1:9876"},
+		GroupName:      "OrderServiceProducerGroup",
+	})
+	defer producer.Shutdown()
+	if err != nil {
+		return productID, err
+	}
+	
+	productJSON, err := json.Marshal(product)
+	if err != nil {
+		return productID, fmt.Errorf("序列化商品信息失败: %v", err)
+	}
+
+	_, err = producer.SendMessage(context.Background(), "update_product", productJSON)
+
+	if err != nil {
+		return productID, err
+	}
+	// fmt.Printf("消息发送成功，消息 ID: %s\n", res.MsgID)
+
+	return productID, nil
 }
 
 func DeleteProduct(product_id uint32) (err error) {

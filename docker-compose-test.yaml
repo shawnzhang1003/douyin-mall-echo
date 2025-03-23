@@ -62,41 +62,73 @@ services:
 
   # RocketMQ
   namesrv:
-    image: apache/rocketmq:latest
-    container_name: rmqnamesrv
-    command: sh mqnamesrv
+    image: apache/rocketmq:5.3.1
+    container_name: rocketmq-namesrv
     ports:
-      - 9876:9876
-    volumes:
-      # 将日志和存储目录挂载到主机，方便持久化数据与日志查看
-      - ./data/rocketmq_data/logs:/home/rocketmq/logs
-      - ./data/rocketmq_data/store:/home/rocketmq/store
+      - "9876:9876"
+    command: sh mqnamesrv
+    networks:
+      - rocketmq
+    restart: always
 
   broker:
-    image: apache/rocketmq:latest
-    container_name: rmqbroker
+    image: apache/rocketmq:5.3.1
+    container_name: rocketmq-broker
+    ports:
+      - "10911:10911"
+      - "10909:10909"
+    environment:
+      - NAMESRV_ADDR=namesrv:9876
+    command: sh /home/rocketmq/rocketmq-5.3.1/bin/mqbroker
     depends_on:
       - namesrv
-    command: sh mqbroker --enable-proxy -c /home/rocketmq/rocketmq/broker.conf
-    ports:
-      - 10911:10911  # Broker 的主服务端口
-      - 10909:10909  # Broker 的通信端口
-      - 10912:10912
-    environment:
-      # 指定 NameSrv 地址
-      - NAMESRV_ADDR=rmqnamesrv:9876
-    volumes:
-      - ./data/rocketmq_data/logs:/home/rocketmq/logs
-      - ./data/rocketmq_data/store:/home/rocketmq/store
-      - ./deploy/rocketmq/:/home/rocketmq/rocketmq
+    networks:
+      - rocketmq
+    restart: always
 
-  redis:
+  dashboard:
+    image: apacherocketmq/rocketmq-dashboard:latest
+    container_name: rocketmq-dashboard
+    ports:
+      - "8989:8989"
+    environment:
+      - JAVA_OPTS=-Drocketmq.namesrv.addr=namesrv:9876
+      - SERVER_PORT=8989  # 设置环境变量
+    depends_on:
+      - namesrv
+      - broker
+    networks:
+      - rocketmq
+    restart: always
+
+
+
+  redis1:
     image: "redis:latest"
     container_name: "my_redis"
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - redis_data1:/data
+      
+
+
+  redis2:
+    image: "redis:latest"
+    container_name: "my_redis-2"
+    ports:
+      - "6380:6380"
+    # environment:
+    #   - PORT=6380  # 设置 Redis 的运行端口
+    command: redis-server --port 6380  # 使用环境变量指定端口
+    volumes:
+      - redis_data2:/data
 
 volumes:
-  redis_data:   
+  redis_data1:   
+  redis_data2:   
+
+
+networks:
+  rocketmq:
+    driver: bridge

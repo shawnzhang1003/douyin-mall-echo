@@ -24,7 +24,7 @@ func RegisterRoutes(e *echo.Echo) {
 		_product.GET("/listProducts", ListProductsHandler)
 		_product.POST("/createProduct", CreateProductHandler)
 		_product.POST("/deleteProduct", DeleteProductHandler)
-		// _product.POST("/updateProduct", UpdateProductHandler)
+		_product.POST("/updateProduct", UpdateProductHandler)
 		api.GET("/hello", HelloWorldHandler)
 	}
 

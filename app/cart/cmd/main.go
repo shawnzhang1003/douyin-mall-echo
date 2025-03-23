@@ -52,6 +52,9 @@ func main() {
 	// 创建rpc server服务实例并自动连接etcd进行服务注册
 	opts := kitexInit()
 	kitexSvr := cart.NewServer(new(rpc.CartServiceImpl), opts...)
+
+	go rmqInit()
+
 	go func() {
 		// Run the rpc server
 		err := kitexSvr.Run()
