@@ -24,6 +24,7 @@ import (
 	"github.com/MakiJOJO/douyin-mall-echo/app/product/internal/dal"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
+	"github.com/MakiJOJO/douyin-mall-echo/pkg/redislock"
 )
 
 type Product struct {
@@ -113,6 +114,28 @@ func CreateProduct(productName string, productDescription string, productPicture
 }
 
 func UpdateProduct(productId uint32, productName string, productDescription string, productPicture string, productPrice float32, categoryName string) (product Product, err error) {
+	// 创建分布式锁实例
+    lockKey := fmt.Sprintf("product_lock:%d", productId)
+    expiration := 10 * time.Second
+    lock := redislock.NewRedisLock(dal.RedisClient, lockKey, expiration)
+
+	ctx := context.Background()
+
+	// 尝试获取锁
+    locked, err := lock.Acquire(ctx)
+    if err != nil {
+        return Product{}, fmt.Errorf("failed to acquire lock: %w", err)
+    }
+    if!locked {
+        return Product{}, fmt.Errorf("failed to acquire lock: lock is already held")
+    }
+    // 确保在函数结束时释放锁
+    defer func() {
+        if err := lock.Release(ctx); err != nil {
+            fmt.Printf("Failed to release lock: %v\n", err)
+        }
+    }()
+
 	db := dal.DB
 	result := db.Model(&Product{}).Where("id = ?", productId).Updates(Product{Name: productName, Price: productPrice, Description: productDescription, Picture: productPicture})
 
